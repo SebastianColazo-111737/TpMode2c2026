@@ -39,6 +39,33 @@ def ecuaciones_diferenciales(t,T, H, P):
 
     return deltaT,deltaH,deltaP
 
+#Euler explícito:
+# yₙ₊₁ = yₙ + h f(tₙ, yₙ)
+#En codigo:
 
+def euler(h):
+    # h vendria a ser el paso fijo
+    # y pasos_segun_h son la cant. de pasos a iterar segun el paso fijo (osea h)
 
+    pasos_segun_h = int((t60 - t0) / h)
 
+    t = np.zeros(pasos_segun_h+1)
+    T = np.zeros(pasos_segun_h+1)
+    H = np.zeros(pasos_segun_h+1)
+    P = np.zeros(pasos_segun_h+1)
+
+    t[0] = t0
+    T[0] = T0
+    H[0] = H0
+    P[0] = P0
+
+    for n in range(pasos_segun_h):
+        deltaT, deltaH, deltaP = ecuaciones_diferenciales(t[n], T[n], H[n], P[n])
+
+        T[n +1] = T[n] + h *deltaT
+        H[n +1] = H[n] + h *deltaH
+        P[n +1] = P[n] + h *deltaP
+
+        t[n+1] = t[1] + h
+
+    return t,T,H,P
