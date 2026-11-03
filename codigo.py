@@ -77,8 +77,9 @@ h_ref = 0.001
 
 t_ref, T_ref, H_ref, P_ref = euler(h_ref)
 
-print(f"(A) Simulación de referencia completada con {len(t_ref)} puntos.") 
-print(f"(A) Valores finales a los 60 meses: T={T_ref[-1]:.3f} °C," f" H={H_ref[-1]:.3f}, P={P_ref[-1]:.3f}")
+print("\n Punto A")
+print(f"Simulación de referencia completada con {len(t_ref)} puntos.") 
+print(f"Valores finales a los 60 meses: T={T_ref[-1]:.3f} °C," f" H={H_ref[-1]:.3f}, P={P_ref[-1]:.3f}")
 
 #grafico:
 
@@ -112,7 +113,7 @@ print("\n Punto B")
 for h in pasos_h:
     t_h, T_h, H_h, P_h = euler(h)
 
-    T_ref_interpolado = np.interp(t_h, t_ref, T_ref) #
+    T_ref_interpolado = np.interp(t_h, t_ref, T_ref) 
 
     error_max = np.max(np.abs(T_ref_interpolado - T_h))
     error_absoluto.append(error_max)
@@ -132,3 +133,49 @@ plt.grid(True, which='both', linestyle='--', alpha=0.7)
 plt.legend() 
 plt.tight_layout() 
 plt.show()
+
+
+#Punto C
+
+ordenes_P = []
+
+print("\n Punto C")
+
+for i in range (len(error_absoluto) -1):
+    err_h = error_absoluto[i]
+    err_2h = error_absoluto[i+1]
+
+    p = math.log(err_2h/err_h) / math.log(2)
+    ordenes_P.append(p)
+
+    h_actual = pasos_h[i]
+    h_doble = pasos_h[i+1]
+    print(f"Entre h={h_actual:.4f} y 2h={h_doble:.4f} -> Orden p: {p:.4f}")
+
+
+
+#Punto D
+
+nuevo_h_grande = 1.25 #probando numeros, encontre que en 1.25 funciona, pero ya en 1.3 se rompe
+
+print(f"\n Punto D, probando con {nuevo_h_grande}")
+
+t_h_nuevo, T_h_nuevo, H_h_nuevo, P_h_nuevo = euler(nuevo_h_grande)
+
+#con esto veo si la solucion muestra inestabilidad
+if ( np.isnan(T_h_nuevo).any() or np.isinf(T_h_nuevo).any() or np.max(np.abs(T_h_nuevo)) > 1000 ): 
+    print( f"CONVERGENCIA FALLIDA: Para h = {nuevo_h_grande} la solución es inestable)." ) 
+
+else:
+    T_ref_interp = np.interp(t_h_nuevo, t_ref, T_ref) 
+    
+    error_max = np.max(np.abs(T_ref_interp - T_h_nuevo)) 
+    
+    print(f"Simulación completada con {len(t_h_nuevo)-1} pasos.") 
+    print( f"Valores finales a los 60 meses: T={T_h_nuevo[-1]:.3f} °C," f" H={H_h_nuevo[-1]:.3f}, P={P_h_nuevo[-1]:.3f}" ) 
+    print(f"Error máximo absoluto en T(t): {error_max:.6f} °C")
+
+
+
+# ' Discuta la diferencia entre error de discretización e inestabilidad numérica a partir de los resultados obtenidos. '
+# 
